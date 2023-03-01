@@ -92,6 +92,6 @@ getData();
 
 // reference: ./WebScrapingTypeScriptNodejs.md
 // original: https://www.thisdot.co/blog/web-scraping-with-typescript-and-node-js
-//
+// repository: https://github.com/tvanantwerp/scraper-example
 
 // Note: JSDOM works with NodeLists and Elements (NOT arrays or objects)
