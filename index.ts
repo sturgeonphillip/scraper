@@ -54,6 +54,8 @@ async function fetchFromWebOrCache (url: string, ignoreCache = false) {
   }
 }
 
+// modified function to select elements
+// according to current html of news.ycombinator.com
 function extractData (document: Document) {
   const writingLinks: HTMLAnchorElement[] = Array.from(
     document.querySelectorAll('span.titleline'),
@@ -88,5 +90,8 @@ async function getData () {
 
 getData();
 
-// *** JSDOM works with NodeLists and Elements (NOT arrays or objects)
-// docment.querySelector('selector');
+// reference: ./WebScrapingTypeScriptNodejs.md
+// original: https://www.thisdot.co/blog/web-scraping-with-typescript-and-node-js
+//
+
+// Note: JSDOM works with NodeLists and Elements (NOT arrays or objects)
