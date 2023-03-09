@@ -1,8 +1,13 @@
-import axios from 'axios';
 import { existsSync, mkdirSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
-import { resolve } from 'path';
+import path, { resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { JSDOM } from 'jsdom';
+import axios from 'axios';
+
+// bring globals into es modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function fetchPage(url) {
   const htmlData = axios
@@ -53,3 +58,30 @@ async function fetchWebOrCache(url, ignoreCache = false) {
     return dom.window.document;
   }
 }
+
+function extract(document) {
+  const links = Array.from(document.querySelectorAll('a.titleLink'));
+  return links.map((link) => {
+    return {
+      title: link.text,
+      url: link.href,
+    };
+  });
+}
+
+function saveData(filename, data) {
+  if (!existsSync(resolve(__dirname, 'data'))) {
+    mkdirSync('data');
+  }
+  writeFile(resolve(__dirname, `data/${filename}.json`), JSON.stringify(data), {
+    encoding: 'utf-8',
+  });
+}
+
+async function getData() {
+  const doc = await fetchWebOrCache('https://news.ycombinator.com/', true);
+  const data = extract(doc);
+  saveData('hacker-news-links', data);
+}
+
+getData();
