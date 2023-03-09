@@ -34,12 +34,12 @@ async function fetchWebOrCache(url, ignoreCache = false) {
     )
   ) {
     console.log(`data read from cache for url: ${url}`);
-    const htmlData = await eradFile(
+    const htmlData = await readFile(
       resolve(__dirname, `.cache/${Buffer.from(url).toString('base64')}.html`),
       { encoding: 'utf8' }
     );
-    const dom = new JSDOM(htmlData);
-    return dom.window.document;
+
+    return htmlData;
   } else {
     console.log(`fresh data fetched from url: ${url}`);
     const htmlData = await fetchPage(url);
@@ -60,11 +60,12 @@ async function fetchWebOrCache(url, ignoreCache = false) {
 }
 
 function extract(document) {
-  const links = Array.from(document.querySelectorAll('a.titleLink'));
+  const links = Array.from(document.querySelectorAll('span.titleline'));
   return links.map((link) => {
+    const a = link.children[0];
     return {
-      title: link.text,
-      url: link.href,
+      title: a.innerHTML,
+      url: a.getAttribute('href'),
     };
   });
 }
@@ -80,7 +81,7 @@ function saveData(filename, data) {
 
 async function getData() {
   const doc = await fetchWebOrCache('https://news.ycombinator.com/', true);
-  const data = extract(doc);
+  const data = typeof document === 'string' ? doc : extract(doc);
   saveData('hacker-news-links', data);
 }
 
